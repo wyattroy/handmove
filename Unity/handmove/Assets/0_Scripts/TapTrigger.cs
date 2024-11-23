@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class TapTrigger : MonoBehaviour
 {
+    [Header("[BuildingBlock] Hand Tracking left")]
     public OVRHand leftHand; // Assign the left hand OVRHand component in the Inspector
+    [Header("[BuildingBlock] Hand Tracking right")]
     public OVRHand rightHand; // Assign the right hand OVRHand component in the Inspector
-    //public UnityEngine.Events.UnityEvent onFirstTap; // Event triggered when a tap is detected
-    //public UnityEngine.Events.UnityEvent onSecondTap; // Event trigger
+    
     public GameObject reticle;
     public OVRCameraRig cameraRig;
 
