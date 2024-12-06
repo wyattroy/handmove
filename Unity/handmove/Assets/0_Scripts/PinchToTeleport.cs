@@ -5,19 +5,22 @@ using UnityEngine;
 public class PinchToTeleport : MonoBehaviour
 {
     [Header("OVR Hand Settings")]
-    public OVRHand hand; // Assign the OVRHand component from the Inspector
-    public OVRInput.Controller handController; // Specify whether it's left or right hand
+    [SerializeField] private OVRHand hand; // Assign the OVRHand component from the Inspector
+    [SerializeField] private OVRInput.Controller handController; // Specify whether it's left or right hand
 
     [Header("Reticle Settings")]
-    public GameObject reticlePrefab; // Assign a prefab for the reticle
-    public LayerMask groundLayer; // Layer mask for valid ground surfaces
-    public float maxDistance = 10f; // Maximum distance for raycast
-    public float smoothingSpeed = 5f; // Speed for reticle movement smoothing
+    [SerializeField] private GameObject reticlePrefab; // Assign a prefab for the reticle
+    [SerializeField] private LayerMask groundLayer; // Layer mask for valid ground surfaces
+    [SerializeField] private float maxDistance = 10f; // Maximum distance for raycast
+    [SerializeField] private Material validMaterial;   // Assign a valid material in the Inspector
+    [SerializeField] private Material invalidMaterial; // Assign an invalid material in the Inspector
 
     private GameObject reticleInstance;
+    private Renderer reticleRenderer;
     private Camera vrCamera;
     private bool isPinching;
     private Vector3 targetPosition;
+    private bool validTeleportLocation;
 
     private void Awake()
     {
@@ -26,6 +29,8 @@ public class PinchToTeleport : MonoBehaviour
         if (vrCamera == null)
         {
             Debug.LogError("No Main Camera found! Ensure your OVRCamera is tagged as MainCamera.");
+            
+            // Immediately stop calling this script so we don't freeze
             enabled = false;
             return;
         }
@@ -33,12 +38,20 @@ public class PinchToTeleport : MonoBehaviour
         // Create the reticle instance
         if (reticlePrefab != null)
         {
+            // Make a new reticle out of the prefab
             reticleInstance = Instantiate(reticlePrefab);
-            reticleInstance.SetActive(false); // Start with the reticle hidden
+
+            // Start with the reticle hidden
+            reticleInstance.SetActive(false); 
+
+            // Cache the Renderer so we can change the Reticle's color later
+            reticleRenderer = reticleInstance.GetComponent<Renderer>();
         }
         else
         {
             Debug.LogError("Reticle prefab is not assigned!");
+            
+            // Immediately quit calling the script so we don't freeze
             enabled = false;
         }
     }
@@ -63,11 +76,21 @@ public class PinchToTeleport : MonoBehaviour
             }
                 
         }
-        else if (reticleInstance.activeSelf)
+        else if (reticleInstance.activeSelf && validTeleportLocation)
         {
             // Perform teleportation if the pinch was released
             TeleportPlayer();
+
+            // And hide the reticle
+            reticleInstance.SetActive(false);
+        } 
+        else
+        {
+            // Hide the reticle after the person stops pinching, even if they can't teleport
+            reticleInstance.SetActive(false);
         }
+        
+        
     }
 
 
@@ -81,19 +104,27 @@ public class PinchToTeleport : MonoBehaviour
         if (Physics.Raycast(rayOrigin, rayDirection, out RaycastHit hit, maxDistance, groundLayer))
         {
             targetPosition = hit.point;
-            
-            // Start the reticle's position exactly where the viewer's looking
+
+            // Start the reticle's position exactly where the viewer's looking, instead of having it lerp from (0,0,0)
             reticleInstance.transform.position = targetPosition;
+            validTeleportLocation = true;
+
+            // Set reticle material to the valid color
+            if (reticleRenderer != null && validMaterial != null)
+                reticleRenderer.material = validMaterial;
         }
         else
         {
             // If no hit, place the reticle at max distance
             targetPosition = rayOrigin + rayDirection * maxDistance;
+            reticleInstance.transform.position = targetPosition;
+            validTeleportLocation = false;
+            
+            // Make the reticle red
+            reticleRenderer.material = invalidMaterial;
         }
 
-        // Smoothly move the reticle to the target position
-        reticleInstance.transform.position = Vector3.Lerp(reticleInstance.transform.position, targetPosition, Time.deltaTime * smoothingSpeed);
-        reticleInstance.transform.rotation = Quaternion.identity; // Ensure the reticle stays flat
+
     }
 
     private void TeleportPlayer()
@@ -102,8 +133,5 @@ public class PinchToTeleport : MonoBehaviour
         Vector3 teleportPosition = targetPosition;
         teleportPosition.y += 0.5f; // Slight offset to prevent the player from being placed inside the ground
         transform.position = teleportPosition;
-
-        // Hide the reticle
-        reticleInstance.SetActive(false);
     }
 }
