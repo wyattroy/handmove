@@ -2,6 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// Written with the help of GPT-4o, about a thousand youtube tutorials, Stack Overflow, and the support of Luis Zanforlin. 
+
+/* USAGE */
+// This script should be attached to the OVR Camera component in your scene.
+// It will allow the player to teleport to wherever they are looking, by pinching their fingers together
+
 public class PinchToTeleport : MonoBehaviour
 {
     [Header("OVR Hand Settings")]
@@ -11,7 +17,7 @@ public class PinchToTeleport : MonoBehaviour
     [Header("Reticle Settings")]
     [SerializeField] private GameObject reticlePrefab; // Assign a prefab for the reticle
     [SerializeField] private LayerMask groundLayer; // Layer mask for valid ground surfaces
-    [SerializeField] private float maxDistance = 10f; // Maximum distance for raycast
+    [SerializeField] private float maxDistance = 10f; // Maximum distance for teleport raycast
     [SerializeField] private Material validMaterial;   // Assign a valid material in the Inspector
     [SerializeField] private Material invalidMaterial; // Assign an invalid material in the Inspector
 
