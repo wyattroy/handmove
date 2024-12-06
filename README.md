@@ -2,8 +2,8 @@ HANDMOVE
 By Wyatt Roy, 12/6/2024
 
 OVERVIEW
-Handmove is a Unity package that lets you teleport around a virtual reality scene without controllers, using a novel UX locomotion mechanic designed by Wyatt.
-It contains a script, prefabs, and a sample scene. It extende Meta All-In-One SDK and runs on Unity 2202.3.9f1 LTS.
+Handmove is a Unity package that lets you teleport around a virtual reality scene without controllers, using a novel UX locomotion mechanic.
+It contains a script, prefabs, and a sample scene. It extends Meta All-In-One SDK and runs on Unity 2202.3.9f1 LTS.
 
 HOW TO DEMO
 1) Side-load the provided APK on a Meta Quest headset, Quest 2 or later. For help sideloading, see https://www.uploadvr.com/sideloading-quest-how-to/
